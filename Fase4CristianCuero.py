@@ -1,24 +1,60 @@
+"""
+Application: Fase4CristianCuero — BST Explorer
+Course: Data Structures (301305) — UNAD
+Student: Cristian Stiven Cuero Caicedo
+Group: 301305_155
+Description: Interactive Graphical User Interface (GUI) developed in Python with Tkinter
+             using Object-Oriented Programming (OOP) to model, visualize, search,
+             and traverse a Binary Search Tree (BST) up to 4 depth levels.
+"""
+
 import tkinter as tk
 from tkinter import messagebox
 from datetime import datetime
 
 
+# Sentinel object used to distinguish between an omitted argument and a None child node
 _MISSING = object()
 
 
 class BSTNode:
+    """Represents a single node in the Binary Search Tree."""
+
     def __init__(self, value):
+        """
+        Initializes a new tree node with an integer key and empty child pointers.
+
+        Args:
+            value (int): Integer value stored in the node.
+        """
         self.value = value
         self.left = None
         self.right = None
 
 
 class BinarySearchTree:
+    """Manages hierarchical BST operations, depth constraints, searching, and traversals."""
+
     def __init__(self, max_levels=4):
+        """
+        Initializes an empty Binary Search Tree with a maximum allowed depth.
+
+        Args:
+            max_levels (int): Maximum number of vertical levels allowed in the tree.
+        """
         self.root = None
         self.max_levels = max_levels
 
     def get_height(self, node=_MISSING):
+        """
+        Recursively calculates the height (number of levels) of the tree or subtree.
+
+        Args:
+            node (BSTNode | object): Current node being evaluated; defaults to tree root.
+
+        Returns:
+            int: Height of the subtree rooted at `node`.
+        """
         if node is _MISSING:
             node = self.root
         if node is None:
@@ -26,6 +62,15 @@ class BinarySearchTree:
         return 1 + max(self.get_height(node.left), self.get_height(node.right))
 
     def count_nodes(self, node=_MISSING):
+        """
+        Recursively counts the total number of nodes in the tree or subtree.
+
+        Args:
+            node (BSTNode | object): Current node being evaluated; defaults to tree root.
+
+        Returns:
+            int: Total node count.
+        """
         if node is _MISSING:
             node = self.root
         if node is None:
@@ -33,6 +78,17 @@ class BinarySearchTree:
         return 1 + self.count_nodes(node.left) + self.count_nodes(node.right)
 
     def insert(self, value):
+        """
+        Inserts a new integer value into the BST while enforcing uniqueness
+        and the maximum depth constraint.
+
+        Args:
+            value (int): Integer value to insert.
+
+        Returns:
+            tuple[bool, str]: (True, success_message) if inserted;
+                              (False, error_message) if duplicate or max depth reached.
+        """
         if self.root is None:
             self.root = BSTNode(value)
             return True, "Node added successfully."
@@ -41,9 +97,11 @@ class BinarySearchTree:
         level = 1
 
         while current is not None:
+            # Prevent duplicate keys
             if value == current.value:
                 return False, f"Node {value} already exists in the tree."
 
+            # Prevent exceeding the maximum allowed depth (level 4)
             if level >= self.max_levels:
                 return (
                     False,
@@ -53,6 +111,7 @@ class BinarySearchTree:
                     f"Clear the tree or choose a different value."
                 )
 
+            # Navigate left or right subtree according to BST property
             if value < current.value:
                 if current.left is None:
                     current.left = BSTNode(value)
@@ -69,6 +128,15 @@ class BinarySearchTree:
         return False, "Unable to insert node."
 
     def search(self, value):
+        """
+        Searches for an integer key in the BST and records the visited path.
+
+        Args:
+            value (int): Target integer value to search.
+
+        Returns:
+            tuple[bool, list[int]]: (True if found, list of visited node values).
+        """
         path = []
         current = self.root
         while current is not None:
@@ -82,44 +150,59 @@ class BinarySearchTree:
         return False, path
 
     def preorder_traversal(self):
+        """Returns a list of node values visited in Pre-order (Root -> Left -> Right)."""
         result = []
         self._preorder(self.root, result)
         return result
 
     def _preorder(self, node, result):
+        """Recursive helper for Pre-order traversal."""
         if node is not None:
             result.append(node.value)
             self._preorder(node.left, result)
             self._preorder(node.right, result)
 
     def inorder_traversal(self):
+        """Returns a list of node values visited in In-order (Left -> Root -> Right)."""
         result = []
         self._inorder(self.root, result)
         return result
 
     def _inorder(self, node, result):
+        """Recursive helper for In-order traversal."""
         if node is not None:
             self._inorder(node.left, result)
             result.append(node.value)
             self._inorder(node.right, result)
 
     def postorder_traversal(self):
+        """Returns a list of node values visited in Post-order (Left -> Right -> Root)."""
         result = []
         self._postorder(self.root, result)
         return result
 
     def _postorder(self, node, result):
+        """Recursive helper for Post-order traversal."""
         if node is not None:
             self._postorder(node.left, result)
             self._postorder(node.right, result)
             result.append(node.value)
 
     def clear(self):
+        """Removes all nodes from the Binary Search Tree."""
         self.root = None
 
 
 class LoginWindow:
+    """Initial authentication window displaying student metadata and password validation."""
+
     def __init__(self, root):
+        """
+        Configures the login window geometry, theme, and user interface components.
+
+        Args:
+            root (tk.Tk): Root Tkinter window instance.
+        """
         self.root = root
         self.root.title("Fase4CristianCuero — Login")
         self.root.geometry("540x620")
@@ -129,6 +212,7 @@ class LoginWindow:
         self.build_ui()
 
     def build_ui(self):
+        """Constructs and arranges all visual widgets inside the login window."""
         title_label = tk.Label(
             self.root,
             text="🌲  BST Explorer",
@@ -147,8 +231,15 @@ class LoginWindow:
         )
         subtitle_label.pack(pady=(0, 18))
 
-        # Info Box
-        info_frame = tk.Frame(self.root, bg="#0f2436", bd=1, relief="solid", highlightbackground="#00b4d8", highlightthickness=1)
+        # Student and academic metadata container
+        info_frame = tk.Frame(
+            self.root,
+            bg="#0f2436",
+            bd=1,
+            relief="solid",
+            highlightbackground="#00b4d8",
+            highlightthickness=1
+        )
         info_frame.pack(padx=40, pady=10, fill="x")
 
         current_date = datetime.now().strftime("%B %d, %Y")
@@ -166,7 +257,7 @@ class LoginWindow:
             tk.Label(row, text=label, font=("Consolas", 10), fg="#7dd3fc", bg="#0f2436", width=15, anchor="w").pack(side="left")
             tk.Label(row, text=val, font=("Consolas", 10, "bold"), fg="#e2e8f0", bg="#0f2436", anchor="w").pack(side="left")
 
-        # Password Section
+        # Masked password input section
         pwd_label = tk.Label(
             self.root,
             text="Enter Password",
@@ -214,7 +305,7 @@ class LoginWindow:
             bg="#091622"
         ).pack(anchor="w", padx=40, pady=(4, 15))
 
-        # Access Button
+        # Login confirmation button
         access_btn = tk.Button(
             self.root,
             text="Access BST Explorer   →",
@@ -237,10 +328,12 @@ class LoginWindow:
         ).pack(side="bottom", pady=14)
 
     def toggle_password(self):
+        """Toggles password visibility between masked asterisks and plain text."""
         self.show_pwd = not self.show_pwd
         self.password_entry.config(show="" if self.show_pwd else "*")
 
     def verify_password(self):
+        """Validates the generic password 'UNAD' and launches the main BST interface."""
         password = self.password_entry.get().strip()
         if password == "UNAD":
             self.root.destroy()
@@ -252,7 +345,15 @@ class LoginWindow:
 
 
 class BSTExplorerApp:
+    """Main interactive GUI application for building, searching, and rendering the BST."""
+
     def __init__(self, root):
+        """
+        Initializes the main BST Explorer workspace, state variables, and canvases.
+
+        Args:
+            root (tk.Tk): Root Tkinter window instance.
+        """
         self.root = root
         self.root.title("Fase4CristianCuero — BST Explorer")
         self.root.geometry("1220x740")
@@ -267,6 +368,7 @@ class BSTExplorerApp:
         self.refresh_all()
 
     def build_main_ui(self):
+        """Builds the header, control sidebar, tree canvas, and traversal panels."""
         # Top Header Bar
         header = tk.Frame(self.root, bg="#0d2133", height=42)
         header.pack(fill="x", side="top")
@@ -287,11 +389,11 @@ class BSTExplorerApp:
             bg="#0d2133"
         ).pack(side="right", padx=15, pady=8)
 
-        # Body Frame
+        # Main Body Container
         body = tk.Frame(self.root, bg="#07131e")
         body.pack(fill="both", expand=True, padx=8, pady=8)
 
-        # Left Controls Panel
+        # Left Controls Sidebar
         controls_frame = tk.Frame(body, bg="#0b1b29", width=210, highlightbackground="#16324a", highlightthickness=1)
         controls_frame.pack(side="left", fill="y", padx=(0, 8))
         controls_frame.pack_propagate(False)
@@ -325,7 +427,7 @@ class BSTExplorerApp:
         self.value_entry.pack(fill="x", padx=12, pady=(4, 12), ipady=5)
         self.value_entry.bind("<Return>", lambda event: self.add_node())
 
-        # Buttons
+        # Action Buttons (Add, Search, Clear, Exit)
         btn_add = tk.Button(
             controls_frame,
             text="+ Add Node",
@@ -374,7 +476,7 @@ class BSTExplorerApp:
         )
         btn_exit.pack(fill="x", padx=12, pady=4, ipady=6)
 
-        # Tree Statistics
+        # Tree Metrics Panel
         stats_box = tk.LabelFrame(
             controls_frame,
             text=" Tree Statistics ",
@@ -395,7 +497,7 @@ class BSTExplorerApp:
         self.lbl_root = tk.Label(stats_box, text="Root: —", font=("Consolas", 9), fg="#e2e8f0", bg="#0b1b29", anchor="w")
         self.lbl_root.pack(fill="x", pady=1)
 
-        # Legend
+        # Visual Color Legend
         legend_box = tk.LabelFrame(
             controls_frame,
             text=" Legend ",
@@ -421,11 +523,11 @@ class BSTExplorerApp:
             dot.create_oval(2, 2, 10, 10, fill=color, outline=color)
             tk.Label(row, text=text, font=("Segoe UI", 8), fg="#cbd5e1", bg="#0b1b29").pack(side="left")
 
-        # Right Area: Tree Canvas + 3 Traversal Panels
+        # Right Visualization Area (Tree Canvas + 3 Traversal Canvases)
         right_panel = tk.Frame(body, bg="#07131e")
         right_panel.pack(side="right", fill="both", expand=True)
 
-        # Panel 1: BST Tree
+        # Panel 1: Hierarchical BST Canvas
         tree_panel = tk.LabelFrame(
             right_panel,
             text=" 🌲 BST Tree (max 4 levels) ",
@@ -441,7 +543,7 @@ class BSTExplorerApp:
         self.tree_canvas.pack(fill="both", expand=True, padx=4, pady=4)
         self.tree_canvas.bind("<Configure>", lambda e: self.draw_tree())
 
-        # Bottom Traversals Container (Panels 2, 3, 4)
+        # Panels 2, 3, and 4: Traversal Sequence Canvases
         traversals_frame = tk.Frame(right_panel, bg="#07131e", height=115)
         traversals_frame.pack(fill="x", side="bottom")
         traversals_frame.pack_propagate(False)
@@ -450,7 +552,7 @@ class BSTExplorerApp:
         self.inorder_canvas = self._create_traversal_panel(traversals_frame, "↳ In-order", "left")
         self.postorder_canvas = self._create_traversal_panel(traversals_frame, "↳ Post-order", "right")
 
-        # Status Bar
+        # Bottom Status Bar
         self.status_label = tk.Label(
             self.root,
             text="Ready.",
@@ -462,6 +564,7 @@ class BSTExplorerApp:
         self.status_label.pack(fill="x", side="bottom", padx=10, pady=(0, 4))
 
     def _create_traversal_panel(self, parent, title, side):
+        """Creates a labeled frame and responsive canvas for a single tree traversal."""
         panel = tk.LabelFrame(
             parent,
             text=f" {title} ",
@@ -480,6 +583,12 @@ class BSTExplorerApp:
         return canvas
 
     def _parse_integer_input(self):
+        """
+        Validates and converts the user text entry into an integer.
+
+        Returns:
+            int | None: Parsed integer value, or None if input is empty or non-numeric.
+        """
         raw = self.value_entry.get().strip()
         if not raw:
             messagebox.showwarning("Empty Input", "Please enter an integer node value.")
@@ -494,6 +603,7 @@ class BSTExplorerApp:
             return None
 
     def add_node(self):
+        """Handles node insertion, error dialogs, and UI refresh."""
         val = self._parse_integer_input()
         if val is None:
             return
@@ -511,6 +621,7 @@ class BSTExplorerApp:
             messagebox.showwarning("Maximum Depth Reached", message)
 
     def search_node(self):
+        """Searches for a node, highlights the search path, and notifies the user."""
         val = self._parse_integer_input()
         if val is None:
             return
@@ -536,6 +647,7 @@ class BSTExplorerApp:
             messagebox.showwarning("Node Not Found", f"Node {val} does not exist in the tree.\nSearched path: {path_str}")
 
     def clear_tree(self):
+        """Resets the BST and clears all canvases and statistics."""
         self.bst.clear()
         self.highlighted_nodes.clear()
         self.found_node = None
@@ -544,6 +656,7 @@ class BSTExplorerApp:
         self.refresh_all()
 
     def refresh_all(self):
+        """Synchronizes statistics labels, tree diagram, and traversal panels."""
         nodes_count = self.bst.count_nodes()
         height_val = self.bst.get_height()
         root_val = self.bst.root.value if self.bst.root else "—"
@@ -558,6 +671,7 @@ class BSTExplorerApp:
         self.draw_traversal(self.postorder_canvas, self.bst.postorder_traversal(), "No post-order data")
 
     def draw_tree(self):
+        """Recursively computes node coordinates and renders edges and nodes on the tree canvas."""
         c = self.tree_canvas
         c.delete("all")
 
@@ -579,10 +693,10 @@ class BSTExplorerApp:
         radius = 20
         top_margin = 42
         level_gap = max(55, (height - top_margin - 30) // 4)
-
         positions = {}
 
         def compute_positions(node, level, left_bound, right_bound):
+            """Assigns horizontal midpoint coordinates per binary partition."""
             if node is None:
                 return
             x = (left_bound + right_bound) // 2
@@ -595,6 +709,7 @@ class BSTExplorerApp:
         compute_positions(self.bst.root, 1, 30, width - 30)
 
         def draw_edges(node):
+            """Draws connecting lines between parent and child nodes."""
             if node is None:
                 return
             x1, y1, _ = positions[id(node)]
@@ -606,6 +721,7 @@ class BSTExplorerApp:
 
         draw_edges(self.bst.root)
 
+        # Render circular nodes with state-based color coding
         for _, (x, y, val) in positions.items():
             if val == self.found_node:
                 fill_color = "#10b981"
@@ -629,6 +745,14 @@ class BSTExplorerApp:
             )
 
     def draw_traversal(self, canvas, values, empty_text):
+        """
+        Renders a linear sequence of visited nodes scaled dynamically to fit the canvas width.
+
+        Args:
+            canvas (tk.Canvas): Target traversal canvas.
+            values (list[int]): Ordered list of visited node values.
+            empty_text (str): Placeholder label when the tree is empty.
+        """
         canvas.delete("all")
         width = canvas.winfo_width()
         height = canvas.winfo_height()
@@ -652,7 +776,7 @@ class BSTExplorerApp:
         usable_width = max(40, width - 2 * margin_x)
         cy = height // 2
 
-        # Dynamic spacing and radius so all nodes fit within the canvas width
+        # Dynamically compute node radius and spacing so all elements fit cleanly
         if n == 1:
             r = min(14, max(8, height // 2 - 6))
             positions = [width // 2]
@@ -684,45 +808,6 @@ class BSTExplorerApp:
                 text=str(val),
                 fill="#091622",
                 font=("Segoe UI", font_size, "bold")
-            )
-        canvas.delete("all")
-        width = canvas.winfo_width()
-        height = canvas.winfo_height()
-        if width <= 10:
-            width = 340
-        if height <= 10:
-            height = 65
-
-        if not values:
-            canvas.create_text(
-                width // 2,
-                height // 2,
-                text=empty_text,
-                fill="#64748b",
-                font=("Segoe UI", 9)
-            )
-            return
-
-        r = 14
-        spacing = 34
-        start_x = 24
-        cy = height // 2
-
-        for idx, val in enumerate(values):
-            cx = start_x + idx * spacing
-            if idx > 0:
-                prev_x = start_x + (idx - 1) * spacing
-                canvas.create_line(prev_x + r, cy, cx - r, cy, fill="#eab308", width=1.5)
-
-            canvas.create_oval(
-                cx - r, cy - r, cx + r, cy + r,
-                fill="#eab308", outline="#fef08a", width=1.5
-            )
-            canvas.create_text(
-                cx, cy,
-                text=str(val),
-                fill="#091622",
-                font=("Segoe UI", 8, "bold")
             )
 
 
